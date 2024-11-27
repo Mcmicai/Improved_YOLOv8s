@@ -7,6 +7,7 @@ import types
 from copy import deepcopy
 from pathlib import Path
 from ultralytics.nn.SPPF import SPPF_improve
+from ultralytics.nn.DualConv import DualConv
 import torch
 import torch.nn as nn
 
@@ -692,7 +693,7 @@ class Ensemble(nn.ModuleList):
     def __init__(self):
         """Initialize an ensemble of models."""
         super().__init__()
-
+        self.stride = torch.tensor([32.0])
     def forward(self, x, augment=False, profile=False, visualize=False):
         """Function generates the YOLO network's final layer."""
         y = [module(x, augment, profile, visualize)[0] for module in self]
@@ -934,6 +935,8 @@ def attempt_load_one_weight(weight, device=None, inplace=True, fuse=False):
 def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
     """Parse a YOLO model.yaml dictionary into a PyTorch model."""
     import ast
+    import contextlib
+    import torch.nn as nn
 
     # Args
     legacy = True  # backward compatibility for v3/v5/v8/v9 models
@@ -964,7 +967,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
                     args[j] = locals()[a] if a in locals() else ast.literal_eval(a)
         n = n_ = max(round(n * depth), 1) if n > 1 else n  # depth gain
 
-        # Add `SPPF_improve` to the supported modules
+        # Add `SPPF_improve` and `DualConv` to the supported modules
         if m in {
             Classify,
             Conv,
@@ -974,6 +977,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             GhostBottleneck,
             SPP,
             SPPF,
+            SPPF_improve,  # Added here
             DWConv,
             Focus,
             BottleneckCSP,
@@ -987,7 +991,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             DWConvTranspose2d,
             C3x,
             RepC3,
-            SPPF_improve,  # Added here
+            DualConv,  # Added here
         }:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
