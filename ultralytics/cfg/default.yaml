@@ -7,10 +7,10 @@ mode: train # (str) YOLO mode, i.e. train, val, predict, export, track, benchmar
 # Train settings -------------------------------------------------------------------------------------------------------
 model: # (str, optional) path to model file, i.e. yolov8n.pt, yolov8n.yaml
 data: # (str, optional) path to data file, i.e. coco8.yaml
-epochs: 100 # (int) number of epochs to train for
+epochs: 200 # (int) number of epochs to train for
 time: # (float, optional) number of hours to train for, overrides epochs if supplied
 patience: 100 # (int) epochs to wait for no observable improvement for early stopping of training
-batch: 16 # (int) number of images per batch (-1 for AutoBatch)
+batch: 8 # (int) number of images per batch (-1 for AutoBatch)
 imgsz: 640 # (int | list) input images size as int for train and val modes, or list[h,w] for predict and export modes
 save: True # (bool) save train checkpoints and predict results
 save_period: -1 # (int) Save checkpoint every x epochs (disabled if < 1)
@@ -87,7 +87,7 @@ workspace: None # (float, optional) TensorRT: workspace size (GiB), `None` will 
 nms: False # (bool) CoreML: add NMS
 
 # Hyperparameters ------------------------------------------------------------------------------------------------------
-lr0: 0.01 # (float) initial learning rate (i.e. SGD=1E-2, Adam=1E-3)
+lr0: 0.1 # (float) initial learning rate (i.e. SGD=1E-2, Adam=1E-3)
 lrf: 0.01 # (float) final learning rate (lr0 * lrf)
 momentum: 0.937 # (float) SGD momentum/Adam beta1
 weight_decay: 0.0005 # (float) optimizer weight decay 5e-4

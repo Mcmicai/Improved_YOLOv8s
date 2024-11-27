@@ -1,4 +1,8 @@
 # Ultralytics YOLO 🚀, AGPL-3.0 license
+from ultralytics.nn.attention.MCA import MCALayer
+from ultralytics.nn.attention.EMCA import EMCA_attention
+from ultralytics.nn.SPPF import SPPF_improve
+from ultralytics.nn.DualConv import DualConv
 
 import contextlib
 import pickle
@@ -6,8 +10,6 @@ import re
 import types
 from copy import deepcopy
 from pathlib import Path
-from ultralytics.nn.SPPF import SPPF_improve
-from ultralytics.nn.DualConv import DualConv
 import torch
 import torch.nn as nn
 
@@ -992,6 +994,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             C3x,
             RepC3,
             DualConv,  # Added here
+            MCALayer,
         }:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
@@ -1010,6 +1013,11 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             }:
                 args.insert(2, n)  # number of repeats
                 n = 1
+        elif m is EMCA_attention:
+            c1, c2 = ch[f], args[0]
+            if c2 != nc:
+                c2 = make_divisible(min(c2, max_channels) * width, 8)
+            args = [c1, *args[1:]]
         elif m is Concat:
             c2 = sum(ch[x] for x in f)
         elif m in {Detect, Segment, Pose}:
@@ -1076,6 +1084,7 @@ def guess_model_task(model):
         model (nn.Module | dict): PyTorch model or model configuration in YAML format.
 
     Returns:
+    MCALayer,
         (str): Task of the model ('detect', 'segment', 'classify', 'pose').
 
     Raises:
