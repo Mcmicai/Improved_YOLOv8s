@@ -3,7 +3,7 @@ from ultralytics.nn.attention.MCA import MCALayer
 from ultralytics.nn.attention.EMCA import EMCA_attention
 from ultralytics.nn.SPPF import SPPF_improve
 from ultralytics.nn.DualConv import DualConv
-
+from ultralytics.nn.attention.mspanet import C2f_MSAM
 import contextlib
 import pickle
 import re
@@ -995,6 +995,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             RepC3,
             DualConv,  # Added here
             MCALayer,
+            C2f_MSAM,
         }:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
@@ -1010,6 +1011,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
                 C3Ghost,
                 C3x,
                 RepC3,
+                C2f_MSAM,
             }:
                 args.insert(2, n)  # number of repeats
                 n = 1

@@ -6,7 +6,7 @@ from ultralytics import YOLO
 
 if __name__ == '__main__':
     # 加载模型
-    model = YOLO("D:/Projects/Improved_YOLOv8s/runs/detect/train6/weights/best.pt")  # 替换为您的模型路径，如果使用自定义模型，加载训练完成的权重文件
+    model = YOLO("D:/Projects/Improved_YOLOv8s/runs/detect/train8/weights/best.pt")  # 替换为您的模型路径，如果使用自定义模型，加载训练完成的权重文件
 
     # 执行验证
     results = model.val(

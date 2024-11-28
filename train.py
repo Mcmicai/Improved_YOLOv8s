@@ -30,7 +30,7 @@ if __name__ == '__main__':
     mp.freeze_support()
 
     # 加载模型
-    model = YOLO("yolov8-EMCA_attention.yaml").load("yolov8s.pt")
+    model = YOLO("yolov8s-EMCA_attention.yaml").load("yolov8s.pt")
     #model = YOLO("yolov8s.pt")
 
     # 添加回调函数
