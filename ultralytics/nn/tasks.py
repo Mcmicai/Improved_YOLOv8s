@@ -4,6 +4,7 @@ from ultralytics.nn.attention.EMCA import EMCA_attention
 from ultralytics.nn.SPPF import SPPF_improve
 from ultralytics.nn.DualConv import DualConv
 from ultralytics.nn.attention.mspanet import C2f_MSAM
+from ultralytics.nn.attention.ascpa import ASCPA
 import contextlib
 import pickle
 import re
@@ -996,6 +997,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             DualConv,  # Added here
             MCALayer,
             C2f_MSAM,
+            ASCPA,
         }:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
