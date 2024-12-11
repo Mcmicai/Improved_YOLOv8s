@@ -1066,12 +1066,11 @@ class C2fPSA(C2f):
         >>> output = model(x)
         >>> print(output.shape)
     """
-
-    def __init__(self, c1, c2, n=1, e=0.5):
-        """Initializes the C2fPSA module, a variant of C2f with PSA blocks for enhanced feature extraction."""
-        assert c1 == c2
-        super().__init__(c1, c2, n=n, e=e)
-        self.m = nn.ModuleList(PSABlock(self.c, attn_ratio=0.5, num_heads=self.c // 64) for _ in range(n))
+def __init__(self, c1, c2, n=1, e=0.5):
+    """Initializes the C2fPSA module, a variant of C2f with PSA blocks for enhanced feature extraction."""
+    assert c1 == c2
+    super().__init__(c1, c2, n=n, e=e)
+    self.m = nn.ModuleList(PSABlock(self.c, attn_ratio=0.5, num_heads=self.c // 64) for _ in range(n))
 
 
 class SCDown(nn.Module):
@@ -1098,12 +1097,3 @@ class SCDown(nn.Module):
         torch.Size([1, 128, 64, 64])
     """
 
-    def __init__(self, c1, c2, k, s):
-        """Initializes the SCDown module with specified input/output channels, kernel size, and stride."""
-        super().__init__()
-        self.cv1 = Conv(c1, c2, 1, 1)
-        self.cv2 = Conv(c2, c2, k=k, s=s, g=c2, act=False)
-
-    def forward(self, x):
-        """Applies convolution and downsampling to the input tensor in the SCDown module."""
-        return self.cv2(self.cv1(x))

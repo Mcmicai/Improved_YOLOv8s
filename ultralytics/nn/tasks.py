@@ -1,10 +1,19 @@
 # Ultralytics YOLO 🚀, AGPL-3.0 license
+from ultralytics.nn.fasterNeXt import FasterNeXt
+from ultralytics.nn.CACSYOLO import CACS_C2f
+from ultralytics.nn.innovate.dysampleSCAM import DySample,SCAM
+from ultralytics.nn.YOLOJD  import  DSCFEM,SPPM
 from ultralytics.nn.attention.MCA import MCALayer
+from ultralytics.nn.AKConv import AKConv
 from ultralytics.nn.attention.EMCA import EMCA_attention
-from ultralytics.nn.SPPF import SPPF_improve
 from ultralytics.nn.DualConv import DualConv
 from ultralytics.nn.attention.mspanet import C2f_MSAM
 from ultralytics.nn.attention.ascpa import ASCPA
+from ultralytics.nn.head.AFPN import ASFF2,ASFF3
+from ultralytics.nn.conv.kan_conv import C2f_KAN
+from ultralytics.nn.modules.GELAN import RepNCSPELAN4, SPPELAN
+from ultralytics.nn.backbone.HCANet import MSFN
+from ultralytics.nn.sppf.SPPF_improve import SPPF_improve
 import contextlib
 import pickle
 import re
@@ -65,6 +74,8 @@ from ultralytics.nn.modules import (
     Segment,
     WorldDetect,
     v10Detect,
+    RepNCSPELAN4, 
+    SPPELAN
 )
 from ultralytics.utils import DEFAULT_CFG_DICT, DEFAULT_CFG_KEYS, LOGGER, colorstr, emojis, yaml_load
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
@@ -998,6 +1009,12 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             MCALayer,
             C2f_MSAM,
             ASCPA,
+            AKConv,
+            C2f_KAN,
+            MSFN,
+            SPPF_improve,
+            DSCFEM,SPPM,
+            CACS_C2f
         }:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
@@ -1014,9 +1031,36 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
                 C3x,
                 RepC3,
                 C2f_MSAM,
+                C2f_KAN
             }:
                 args.insert(2, n)  # number of repeats
                 n = 1
+        elif m is FasterNeXt:
+            c1, c2 = ch[f], args[0]
+            if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
+                c2 = make_divisible(min(c2, max_channels) * width, 8)
+            args = [c1, c2, *args[1:]]
+            if m is FasterNeXt:
+                args.insert(2, n)  # number of repeats
+                n = 1
+        elif m is nn.BatchNorm2d:
+            args = [ch[f]]
+        elif m is AIFI:
+            args = [ch[f], *args]
+        elif m is DySample:
+            c2 = ch[f]
+            args = [c2, *args]
+        elif m is SCAM:
+            c2 = ch[f]
+            args = [c2]
+        elif m is ASFF2:
+            c1, c2 = [ch[f[0]], ch[f[1]]], args[0]
+            c2 = make_divisible(min(c2, max_channels) * width, 8)
+            args = [c1, c2, *args[1:]]
+        elif m is ASFF3:
+            c1, c2 = [ch[f[0]], ch[f[1]], ch[f[2]]], args[0]
+            c2 = make_divisible(min(c2, max_channels) * width, 8)
+            args = [c1, c2, *args[1:]]
         elif m is EMCA_attention:
             c1, c2 = ch[f], args[0]
             if c2 != nc:

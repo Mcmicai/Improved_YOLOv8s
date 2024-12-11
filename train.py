@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     # 加载预训练的 YOLOv8 模型
     # 模型可以通过 YAML 文件配置，也可以直接加载权重文件
-    model = YOLO("yolov8s-DualConv.yaml").load("yolov8s.pt")
+    model = YOLO("yolov8s-JD-C2f-MSAM3.yaml").load("yolov8s.pt")
     #model = YOLO("yolov5s.pt")
 
     # 添加冻结层的回调函数
